@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# The idea is to check out the last branch and then run this command
+
+# This grabs the commit SHAs, then orders them from first to last and removes the last one. The
+# last one is `master`
+COMMITS=$(git log | grep commit | sed -e 's/commit //' | tail -r | sed '$d')
+
+STEP=1
+for COMMIT in $COMMITS; do
+    echo "Step $STEP: $COMMIT"
+    git branch -D $STEP 2> /dev/null > /dev/null
+    git branch $STEP $COMMIT
+    STEP=$(expr $STEP + 1)
+done
+
+echo
+echo "Now run 'git push --all -f' to update everything on the remote"
+echo
+echo "If you're a wimp, run 'git push --all' to see that the step numbers all conflict and master doesn't."
+echo "That's the expected result"
